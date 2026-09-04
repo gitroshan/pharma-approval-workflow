@@ -1,0 +1,103 @@
+// Prisma schema for the Approval Workflow service.
+//
+// Design notes:
+//  * `AuditEvent` is an append-only, hash-chained log. Each row stores the hash
+//    of the previous row plus a hash of its own canonical content, giving a
+//    tamper-evident trail suitable for GxP / 21 CFR Part 11 style expectations.
+//    (The application layer never issues UPDATE or DELETE against this table.)
+//  * Enums mirror the domain layer in src/domain/types.ts.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUBMITTER
+  REVIEWER
+  APPROVER
+  AUDITOR
+  ADMIN
+}
+
+enum RequestStatus {
+  DRAFT
+  SUBMITTED
+  IN_REVIEW
+  CHANGES_REQUESTED
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  fullName     String
+  passwordHash String
+  roles        Role[]
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  ownedRequests Request[]     @relation("RequestOwner")
+  auditEvents   AuditEvent[]  @relation("AuditActor")
+}
+
+model Request {
+  id          String        @id @default(cuid())
+  title       String
+  description String
+  // Category of the controlled item, e.g. "SOP", "PROMOTIONAL_MATERIAL".
+  category    String
+  status      RequestStatus @default(DRAFT)
+
+  owner   User   @relation("RequestOwner", fields: [ownerId], references: [id])
+  ownerId String
+
+  // Reference to the source document in the external Document Management System.
+  dmsDocumentId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  auditEvents AuditEvent[] @relation("AuditRequest")
+
+  @@index([status])
+  @@index([ownerId])
+}
+
+model AuditEvent {
+  id       String @id @default(cuid())
+  // Monotonic sequence used to order and chain events.
+  seq      BigInt @unique @default(autoincrement())
+
+  request   Request? @relation("AuditRequest", fields: [requestId], references: [id])
+  requestId String?
+
+  actor   User   @relation("AuditActor", fields: [actorId], references: [id])
+  actorId String
+
+  // e.g. "REQUEST_CREATED", "SUBMIT", "APPROVE", "USER_LOGIN".
+  action     String
+  fromStatus RequestStatus?
+  toStatus   RequestStatus?
+  comment    String?
+  // Arbitrary structured context (IP, integration payloads, etc.).
+  metadata   Json?
+
+  // Tamper-evident hash chain.
+  prevHash String
+  hash     String
+
+  createdAt DateTime @default(now())
+
+  @@index([requestId])
+  @@index([actorId])
+  @@index([createdAt])
+}
