@@ -1,0 +1,80 @@
+# One-command local stack:  docker compose up --build
+#
+#   web (nginx + SPA)      -> http://localhost:8080
+#   api (Express)          -> http://localhost:4000
+#   dms  (mock platform A) -> http://localhost:5101
+#   identity (platform B)  -> http://localhost:5102
+#   db  (PostgreSQL 16)
+#
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: approval
+    ports:
+      - '5432:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U app -d approval']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  dms:
+    image: node:22-slim
+    working_dir: /app
+    volumes:
+      - ./mock-platforms/dms:/app
+    command: sh -c "npm install --no-audit --no-fund && node server.js"
+    environment:
+      PORT: 5101
+      DMS_API_KEY: dms-sample-key
+    ports:
+      - '5101:5101'
+
+  identity:
+    image: node:22-slim
+    working_dir: /app
+    volumes:
+      - ./mock-platforms/identity:/app
+    command: sh -c "npm install --no-audit --no-fund && node server.js"
+    environment:
+      PORT: 5102
+      IDENTITY_API_KEY: identity-sample-key
+    ports:
+      - '5102:5102'
+
+  api:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+      dms:
+        condition: service_started
+      identity:
+        condition: service_started
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://app:app@db:5432/approval?schema=public
+      JWT_SECRET: local-dev-secret-change-me-please-32b
+      CORS_ORIGIN: http://localhost:8080
+      DMS_BASE_URL: http://dms:5101
+      DMS_API_KEY: dms-sample-key
+      IDENTITY_BASE_URL: http://identity:5102
+      IDENTITY_API_KEY: identity-sample-key
+    ports:
+      - '4000:4000'
+
+  web:
+    build: ./frontend
+    depends_on:
+      - api
+    ports:
+      - '8080:80'
+
+volumes:
+  db-data:
