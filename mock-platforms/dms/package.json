@@ -1,0 +1,9 @@
+{
+  "name": "mock-dms",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Mock Document Management System (external internal platform A).",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.21.2" }
+}
