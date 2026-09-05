@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { api } from '../lib/api';
 import type { User } from '../lib/types';
 
@@ -16,7 +16,7 @@ export function Login({ onLogin }: { onLogin: (u: User) => void }) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
     setError(null);

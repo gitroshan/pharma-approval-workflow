@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { api } from '../lib/api';
 
 const CATEGORIES = ['SOP', 'PROMOTIONAL_MATERIAL', 'BATCH_RECORD'];
@@ -11,7 +11,7 @@ export function NewRequest({ onCreated, onCancel }: { onCreated: (id: string) =>
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
     setError(null);

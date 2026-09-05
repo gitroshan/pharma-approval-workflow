@@ -178,6 +178,12 @@ vault, and the client's real internal platforms in place of the mocks. Those
 trade-offs are called out where they occur. The intent is to show how the team
 thinks and builds, not to ship a finished product.
 
+## Screenshots
+
+| Tamper-evident audit trail | Review & approve (role-based) | Role-based sign-in |
+| --- | --- | --- |
+| ![Audit trail](docs/screenshots/audit-trail.png) | ![Request detail](docs/screenshots/request-detail.png) | ![Sign-in](docs/screenshots/login.png) |
+
 ## License
 
 MIT — see [`LICENSE`](./LICENSE).
