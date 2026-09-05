@@ -1,5 +1,7 @@
 # Secure Role-Based Approval Workflow
 
+> Secure, role-based approval workflow for regulated pharma/healthcare — RBAC with separation of duties, a tamper-evident hash-chained audit trail, and API integration with internal platforms. TypeScript · React · PostgreSQL · Docker.
+
 A reference implementation of a **secure, role-based approval workflow** for a
 regulated (pharmaceutical / healthcare) environment. It demonstrates the
 capabilities an enterprise workflow platform in this sector requires:
