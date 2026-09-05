@@ -180,9 +180,13 @@ thinks and builds, not to ship a finished product.
 
 ## Screenshots
 
-| Tamper-evident audit trail | Review & approve (role-based) | Role-based sign-in |
+A single request moving through the full lifecycle — author to reviewer to approver — followed by the audit views. Every control is role-gated: a user only sees the actions their role permits, and the author of a request can never review or approve it.
+
+| | | |
 | --- | --- | --- |
-| ![Audit trail](docs/screenshots/audit-trail.png) | ![Request detail](docs/screenshots/request-detail.png) | ![Sign-in](docs/screenshots/login.png) |
+| ![Sign in](docs/screenshots/01-sign-in.png)<br>**Sign in** — role-based accounts | ![Dashboard](docs/screenshots/02-requests-dashboard.png)<br>**Dashboard** — status at a glance | ![New request](docs/screenshots/03-new-request.png)<br>**Author** — new request (DMS link) |
+| ![Draft](docs/screenshots/04-submitter-draft.png)<br>**Draft** — submit for review | ![Start review](docs/screenshots/05-reviewer-start-review.png)<br>**Reviewer** — start review | ![Recommend](docs/screenshots/06-reviewer-recommend.png)<br>**Reviewer** — recommend / request changes |
+| ![Approve](docs/screenshots/07-approver-approve.png)<br>**Approver** — approve / reject | ![Audit trail](docs/screenshots/08-audit-trail.png)<br>**Audit** — hash chain *verified* | ![Request audit](docs/screenshots/09-request-audit.png)<br>**Per-request** — full history |
 
 ## License
 
